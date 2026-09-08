@@ -6,7 +6,8 @@ from telegram.request import HTTPXRequest
 TOKEN = os.environ.get("BOT_TOKEN")
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text(f'হ্যালো {update.effective_user.first_name}! আমি সচল আছি।')
+    user_name = update.effective_user.first_name or "বন্ধু"
+    await update.message.reply_text(f'হ্যালো {user_name}! আমি সচল আছি।')
 
 if __name__ == '__main__':
     request = HTTPXRequest(connect_timeout=30.0, read_timeout=30.0)
