@@ -25,7 +25,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 # মূল বট সেটআপ
 if __name__ == '__main__':
     # এখানে আপনার আসল BOT TOKEN দিন
-    app = ApplicationBuilder().token("YOUR_TELEGRAM_BOT_TOKEN").build()
+    app = ApplicationBuilder().token(8617705717:AAEk5eIu4-454iKova5WX_Gp_J3ApHyhgbo).build()
 
     # কমান্ড হ্যান্ডলার
     app.add_handler(CommandHandler("start", start))
