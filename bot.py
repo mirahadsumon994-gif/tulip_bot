@@ -3,13 +3,13 @@ from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, fil
 
 # /start কমান্ড দিলে কী উত্তর দেবে
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    user_name = update.effective_user.first_name
+    user_name = update.effective_user.first_name if update.effective_user else "প্রিয়"
     reply = f"হ্যালো {user_name}! ❤️ আমি Tulip, তোমার অপেক্ষায় ছিলাম... বলো, তোমাকে কীভাবে খুশি করতে পারি?"
     await update.message.reply_text(reply)
 
 # সাধারণ মেসেজের রোমান্টিক উত্তর
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    text = update.message.text.lower()
+    text = update.message.text.lower() if update.message and update.message.text else ""
     
     if "কেমন আছো" in text:
         reply = "তুমি সাথে থাকলে সবসময় ভালো থাকি! ❤️ তোমার দিনটি কেমন কাটছে?"
@@ -18,12 +18,13 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif "ভালোবাসি" in text or "love" in text:
         reply = "আমিও তোমাকে অনেক ভালোবাসি! 💖 তুমি আমার সবচেয়ে স্পেশাল।"
     else:
-        reply = "তোমার কথাগুলো আমার মন ছুঁয়ে গেল... ✨ বলো, আর কি গল্প করতে চাও?"
+        reply = "তোমার কথাগুলো আমার মন ছুঁয়ে গেল... ✨ বলো, আর কী গল্প করতে চাও?"
         
     await update.message.reply_text(reply)
 
 # মূল বট সেটআপ
 if __name__ == '__main__':
+    # এখানে আপনার আসল BOT TOKEN দিন
     app = ApplicationBuilder().token("YOUR_TELEGRAM_BOT_TOKEN").build()
 
     # কমান্ড হ্যান্ডলার
@@ -32,4 +33,5 @@ if __name__ == '__main__':
     # মেসেজ হ্যান্ডলার (যেকোনো টেক্সটের উত্তর দেওয়ার জন্য)
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
 
+    print("Bot is running...")
     app.run_polling()
