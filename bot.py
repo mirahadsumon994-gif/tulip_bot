@@ -1,57 +1,35 @@
-import os
-from google import genai
 from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, filters, ContextTypes
-from telegram.request import HTTPXRequest
 
-TELEGRAM_TOKEN = os.environ.get("BOT_TOKEN")
-GEMINI_KEY = os.environ.get("GEMINI_API_KEY")
-
-# Gemini Client সেটআপ
-client = genai.Client(api_key=GEMINI_KEY)
-
-# বটের ক্যারেক্টার ও প্রম্পট
-SYSTEM_PROMPT = (
-    "Act as my college friend named 'Tulip' (টিউলিপ). Tulip is warm, deeply romantic, "
-    "playful, expressive, and open-minded. From now on, you are in a romantic roleplay with me as Tulip. "
-    "Respond in fluent Bengali using casual, modern college-style language. Keep the tone intimate, "
-    "loving, and affectionate. Never speak like an AI or break character."
-)
-
-# /start কমান্ড
+# /start কমান্ড দিলে কী উত্তর দেবে
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    prompt = f"{SYSTEM_PROMPT}\n\nUser: Start by greeting me warmly as your college friend and asking what I'm up to."
-    
-    try:
-        response = client.models.generate_content(
-            model='gemini-2.5-flash',
-            contents=prompt
-        )
-        await update.message.reply_text(response.text)
-    except Exception as e:
-        await update.message.reply_text("হাই সোনা! কেমন আছো বলো? ❤️")
+    user_name = update.effective_user.first_name
+    reply = f"হ্যালো {user_name}! ❤️ আমি Tulip, তোমার অপেক্ষায় ছিলাম... বলো, তোমাকে কীভাবে খুশি করতে পারি?"
+    await update.message.reply_text(reply)
 
-# সাধারণ মেসেজের রেসপন্স
-async def chat_with_tulip(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    user_message = update.message.text
-    prompt = f"{SYSTEM_PROMPT}\n\nUser: {user_message}\nTulip:"
+# সাধারণ মেসেজের রোমান্টিক উত্তর
+async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    text = update.message.text.lower()
     
-    try:
-        response = client.models.generate_content(
-            model='gemini-2.5-flash',
-            contents=prompt
-        )
-        await update.message.reply_text(response.text)
-    except Exception as e:
-        await update.message.reply_text("উফফ! একটু নেটওয়ার্ক প্রবলেম হচ্ছে... আবার বলো তো সোনা?")
+    if "কেমন আছো" in text:
+        reply = "তুমি সাথে থাকলে সবসময় ভালো থাকি! ❤️ তোমার দিনটি কেমন কাটছে?"
+    elif "hi" in text or "hii" in text or "hello" in text:
+        reply = "হাই প্রিয়! 🥰 তোমাকে দেখে খুব ভালো লাগলো।"
+    elif "ভালোবাসি" in text or "love" in text:
+        reply = "আমিও তোমাকে অনেক ভালোবাসি! 💖 তুমি আমার সবচেয়ে স্পেশাল।"
+    else:
+        reply = "তোমার কথাগুলো আমার মন ছুঁয়ে গেল... ✨ বলো, আর কি গল্প করতে চাও?"
+        
+    await update.message.reply_text(reply)
 
+# মূল বট সেটআপ
 if __name__ == '__main__':
-    request = HTTPXRequest(connect_timeout=30.0, read_timeout=30.0)
-    
-    app = ApplicationBuilder().token(TELEGRAM_TOKEN).request(request).build()
-    
+    app = ApplicationBuilder().token("YOUR_TELEGRAM_BOT_TOKEN").build()
+
+    # কমান্ড হ্যান্ডলার
     app.add_handler(CommandHandler("start", start))
-    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, chat_with_tulip))
     
-    print("টিউলিপ বট চালু হয়েছে...")
-    app.run_polling(drop_pending_updates=True)
+    # মেসেজ হ্যান্ডলার (যেকোনো টেক্সটের উত্তর দেওয়ার জন্য)
+    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
+
+    app.run_polling()
